@@ -27,6 +27,14 @@ public class StateReader : MonoBehaviour
     public float[] positions;
     public float[] velocities;
     public float[] forces;
+    ////////////////
+
+    public GameObject r_notify;
+    public GameObject l_notify;
+    //right part of sensor
+    public int numberOfRays=9;
+    public float angle=90;
+    public float rayRange=.18f;
 
     void Start()
     {
@@ -53,6 +61,55 @@ public class StateReader : MonoBehaviour
 
     void Update()
     {
+       //left sensor
+        for (int i=0; i<numberOfRays; i++){
+            var rotation = this.transform.rotation;
+            var rotationMod = Quaternion.AngleAxis(-10+(i/((float)numberOfRays-1))*-angle, this.transform.up);
+            var direction = rotation * rotationMod * Vector3.forward;
+            var ray= new Ray(this.transform.position,direction);
+            RaycastHit hitInfo;
+
+            //if hit something
+            if(Physics.Raycast(ray, out hitInfo, rayRange)){
+
+                //able left_notify_object
+               
+	            l_notify.SetActive(true);
+
+            }
+            else{
+                //enable left_notify_object
+	            l_notify.SetActive(false);
+            }
+        }
+        ReadState();
+        this.transform.position = position;
+
+
+
+
+        //right sensor
+        var deltaPosition = Vector3.zero; 
+        for (int i=0; i<numberOfRays; i++){
+            var rotation_r = this.transform.rotation;
+            var rotationMod_r = Quaternion.AngleAxis(10+(i/((float)numberOfRays-1))*angle, this.transform.up);
+            var direction_r = rotation_r * rotationMod_r * Vector3.forward;
+            var ray_r= new Ray(this.transform.position,direction_r);
+            RaycastHit hitInfo_r;
+
+            //if hit something
+            if(Physics.Raycast(ray_r, out hitInfo_r, rayRange)){
+
+                //able right_notify_object
+                r_notify.SetActive(true);
+
+            }
+            else{
+                r_notify.SetActive(false);
+            }
+        }
+        ReadState();
+        this.transform.position = position;
     }
 
     void ReadState()
